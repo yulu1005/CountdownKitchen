@@ -25,4 +25,4 @@
 
 ## 📆 時程規劃
 請見 docs 或甘特圖附件。
-
+![image](https://github.com/user-attachments/assets/96552ca3-3bcb-4975-8ad9-51e28826c2c2)
