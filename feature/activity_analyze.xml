@@ -1,60 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".analyze">
+    tools:context=".SettingActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <!-- 第一部分：浪費比例 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="浪費比例"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginVertical="8dp"
-            android:background="#CCCCCC" />
-
-        <!-- 圓餅圖 Placeholder（可改成真正的 PieChart 元件） -->
-        <ImageView
-            android:id="@+id/pie_chart"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:src="@drawable/ic_pie_chart_placeholder"
-            android:scaleType="fitCenter"
-            android:contentDescription="浪費比例圖" />
-
-        <!-- 第二部分：已刪除之食品 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="已刪除之食品"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginVertical="8dp"
-            android:background="#CCCCCC" />
-
-        <!-- 動態列表顯示區域 -->
         <LinearLayout
-            android:id="@+id/deleted_food_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:orientation="vertical"
+            android:padding="18dp">
+
+            <!-- 第一部分：浪費比例 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="浪費比例"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="8dp"
+                android:background="#CCCCCC" />
+
+            <!-- 圓餅圖 Placeholder（可改成真正的 PieChart 元件） -->
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/pie_chart"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- 第二部分：已刪除之食品 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="已刪除之食品"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="8dp"
+                android:background="#CCCCCC" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="300dp" />
+
+            <!-- 動態列表顯示區域 -->
+
+
+        </LinearLayout>
 
     </LinearLayout>
-</ScrollView>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="24dp"
+        android:clickable="true"
+        android:contentDescription="返回"
+        app:backgroundTint="#86BFFF"
+        app:iconSize="100dp"
+        app:srcCompat="@drawable/ic_keyboard_backspace"
+        app:tint="@android:color/white" />
+</FrameLayout>
