@@ -15,12 +15,15 @@ import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.github.mikephil.charting.formatter.PercentFormatter
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
+import com.github.mikephil.charting.formatter.ValueFormatter
 
 class AnalyzeActivity : AppCompatActivity() {
     private lateinit var wasteDao: WasteDao
     private lateinit var eatenDao: EatenDao
+    private lateinit var foodDao: FoodDao
     private val outList = mutableListOf<OutItem>()
     private lateinit var outAdapter: OutItemAdapter
     private lateinit var pieChart: PieChart
@@ -40,17 +43,61 @@ class AnalyzeActivity : AppCompatActivity() {
         val database = AppDatabase.getDatabase(this)
         wasteDao = database.wasteDao()
         eatenDao = database.eatenDao()
+        foodDao = database.foodDao()
 
         // 初始化 PieChart
         pieChart = findViewById(R.id.pie_chart)
 
         // 初始化 RecyclerView
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-        outAdapter = OutItemAdapter(outList)
+        outAdapter = OutItemAdapter(outList) { item ->
+            // 处理返回按钮点击事件
+            lifecycleScope.launch {
+                when (item.state) {
+                    "廚餘" -> {
+                        // 从厨余表中删除
+                        val wasteItems = wasteDao.getAll()
+                        val wasteItem = wasteItems.find { it.name == item.name }
+                        wasteItem?.let { wasteDao.delete(it) }
+                    }
+                    "完食" -> {
+                        // 从完食表中删除
+                        val eatenItems = eatenDao.getAll()
+                        val eatenItem = eatenItems.find { it.name == item.name }
+                        eatenItem?.let { eatenDao.delete(it) }
+                    }
+                }
+                // 将食品添加回主列表
+                foodDao.insert(FoodItem(
+                    name = item.name,
+                    category = "冷藏", // 默认分类
+                    expiryDate = item.date,
+                    note = item.note,
+                    type = item.type
+                ))
+                // 刷新列表
+                refreshList()
+            }
+        }
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = outAdapter
 
-        // 加載資料並設定 PieChart
+        // 加载数据
+        refreshList()
+
+        // 返回按钮
+//        val fabBack = findViewById<FloatingActionButton>(R.id.fab_add)
+//        fabBack.setOnClickListener {
+//            val intent = Intent(this, Main::class.java)
+//            startActivity(intent)
+//            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+//            finish()
+//        }
+        setupBottomNav(this, R.id.nav_analyze)
+
+    }
+
+    private fun refreshList() {
         lifecycleScope.launch {
             try {
                 val wasteList = wasteDao.getAll()
@@ -58,15 +105,15 @@ class AnalyzeActivity : AppCompatActivity() {
 
                 outList.clear()
                 wasteList.forEach { waste ->
-                    outList.add(OutItem(waste.name, "廚餘", waste.date))
+                    outList.add(OutItem(waste.name, "廚餘", waste.date,waste.category,waste.type,waste.note))
                 }
                 eatenList.forEach { eaten ->
-                    outList.add(OutItem(eaten.name, "完食", eaten.date))
+                    outList.add(OutItem(eaten.name, "完食", eaten.date,eaten.category,eaten.type,eaten.note))
                 }
                 outList.sortByDescending { it.date }
                 outAdapter.notifyDataSetChanged()
 
-                // 統計數據
+                // 统计数据
                 val dataMap = mapOf(
                     "廚餘" to wasteList.size,
                     "完食" to eatenList.size
@@ -77,15 +124,6 @@ class AnalyzeActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         }
-
-        // 返回按鈕
-        val fabBack = findViewById<FloatingActionButton>(R.id.fab_add)
-        fabBack.setOnClickListener {
-            val intent = Intent(this, Main::class.java)
-            startActivity(intent)
-            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-            finish()
-        }
     }
 
     private fun setupPieChart(dataMap: Map<String, Int>) {
@@ -93,20 +131,32 @@ class AnalyzeActivity : AppCompatActivity() {
         dataMap.forEach { (label, value) ->
             if (value > 0) entries.add(PieEntry(value.toFloat(), label))
         }
-
+        class IntPercentFormatter : ValueFormatter() {
+            override fun getFormattedValue(value: Float): String {
+                return "${value.toInt()}%"
+            }
+        }
         val dataSet = PieDataSet(entries, "浪費概況")
         dataSet.colors = listOf(Color.parseColor("#86BFFF"), Color.parseColor("#FFF59D"))
-        dataSet.valueTextSize = 14f
+        dataSet.valueTextSize = 16f
+        dataSet.valueTextColor = Color.DKGRAY
 
         val data = PieData(dataSet)
+
+// ✅ 顯示百分比
+        pieChart.setUsePercentValues(true)
+        data.setValueFormatter(IntPercentFormatter())
+
+// ✅ 設定 PieChart 外觀
         pieChart.data = data
         pieChart.description.isEnabled = false
         pieChart.centerText = "浪費比例"
-        pieChart.setEntryLabelColor(Color.BLACK)
         pieChart.setCenterTextSize(18f)
+        pieChart.setEntryLabelColor(Color.BLACK)
         pieChart.animateY(1000)
         pieChart.invalidate()
 
+// ✅ 圖例設定
         val legend = pieChart.legend
         legend.textSize = 14f
         legend.formSize = 12f
@@ -117,8 +167,5 @@ class AnalyzeActivity : AppCompatActivity() {
         legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
         legend.setDrawInside(false)
 
-        dataSet.valueTextSize = 16f  // 數值字體
-        dataSet.valueTextColor = Color.DKGRAY
     }
 }
-
