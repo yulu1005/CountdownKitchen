@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [FoodItem::class, WasteItem::class, EatenItem::class],
-    version = 2,  // ← 確保你有改成大於原本的版本（1 → 2）
+    version = 2,  
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
