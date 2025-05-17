@@ -9,5 +9,26 @@ data class FoodItem(
     val name: String,
     val category: String,
     val expiryDate: String,
-    val note: String
+    val note: String,
+    val type: String
+)
+
+@Entity(tableName = "waste_table")
+data class WasteItem(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val name: String,
+    val category: String,
+    val note: String,
+    val type: String,
+    val date: String
+)
+
+@Entity(tableName = "eaten_table")
+data class EatenItem(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val name: String,
+    val category: String,
+    val note: String,
+    val type: String,
+    val date: String
 )
