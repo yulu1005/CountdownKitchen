@@ -1,22 +1,21 @@
 graph TD
-  user[使用者（家庭食材管理者）]
+  user[使用者]
 
-  subgraph Mobile App（Android）
-    ui[UI 操作層<br>主畫面 / 查詢 / 圖表]
-    scan[ZXing 條碼掃描模組]
-    notif[到期提醒模組<br>NotificationManager]
-    db[Room 本地資料庫]
-    api[API 模組<br>連接 OpenFoodFacts]
+  subgraph Android App（倒數計食）
+    mainUI[主畫面操作]
+    reminder[提醒模組<br>（NotificationManager）]
+    scan[條碼/QRCode 掃描模組<br>（ZXing）]
+    db[本地資料儲存<br>（Room DB）]
+    apiModule[API 查詢模組<br>（OpenFoodFacts）]
   end
 
-  subgraph 外部資源
+  subgraph 外部資源（雲端）
     OFF[Open Food Facts API]
   end
 
-  user --> ui
-  ui --> scan
-  ui --> notif
-  ui --> db
-  ui --> api
-  scan --> api
-  api --> OFF
+  user --> mainUI
+  mainUI --> reminder
+  mainUI --> scan
+  mainUI --> db
+  scan --> apiModule
+  apiModule --> OFF
