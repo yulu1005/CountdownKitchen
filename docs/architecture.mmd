@@ -1,39 +1,39 @@
 graph TD
-    subgraph 表示層（Presentation Layer）
-        A[所有畫面活動 Activities] --> B[主畫面 MainActivity]
-        A --> C[搜尋畫面 SearchActivity]
-        A --> D[分析圖表畫面 AnalyzeActivity]
-        A --> E[設定畫面 SettingActivity]
-        A --> V[相機畫面 CameraActivity]
+    subgraph Presentation_Layer  %% 表示層
+        A[Activities] --> B[MainActivity]
+        A --> C[SearchActivity]
+        A --> D[AnalyzeActivity]
+        A --> E[SettingActivity]
+        A --> V[CameraActivity]
         
-        B --> F[UI 元件]
+        B --> F[UI Components]
         C --> F
         D --> F
         E --> F
-        V --> W[相機預覽畫面 Camera Preview]
-        V --> X[條碼掃描 QR Scanner]
+        V --> W[Camera Preview]
+        V --> X[QR Scanner]
     end
 
-    subgraph 資料層（Data Layer）
-        G[本地資料庫 Room DB] --> H[FoodDao（食物資料）]
-        G --> I[WasteDao（報廢資料）]
-        G --> J[EatenDao（吃完紀錄）]
+    subgraph Data_Layer  %% 資料層
+        G[Room DB] --> H[FoodDao]
+        G --> I[WasteDao]
+        G --> J[EatenDao]
         
-        H --> K[FoodItem（食物項目）]
-        I --> L[WasteItem（報廢項目）]
-        J --> M[EatenItem（已吃項目）]
+        H --> K[FoodItem]
+        I --> L[WasteItem]
+        J --> M[EatenItem]
     end
 
-    subgraph 商業邏輯層（Business Logic）
-        N[ViewModel] --> O[食物管理邏輯]
-        N --> P[報廢分析邏輯]
-        N --> Q[搜尋邏輯]
-        N --> R[QR Code 處理邏輯]
+    subgraph Business_Logic  %% 商業邏輯層
+        N[ViewModel] --> O[Food Management]
+        N --> P[Waste Analysis]
+        N --> Q[Search Logic]
+        N --> R[QR Code Processing]
     end
 
-    subgraph 外部 API（External APIs）
-        S[Android 相機 API] --> T[相機功能]
-        U[ZXing 掃描套件] --> Y[QR Code 解碼功能]
+    subgraph External_APIs  %% 外部 API
+        S[Android Camera API] --> T[Camera Features]
+        U[ZXing Library] --> Y[QR Code Decoding]
     end
 
     F --> N
