@@ -1,24 +1,35 @@
 graph TD
-    A[CountdownKitchen App] --> B[UI Layer]
-    A --> C[Feature Layer]
-    
-    B --> D[MainActivity]
-    B --> E[UI Components]
-    B --> F[Drawable Resources]
-    
-    C --> G[Feature Modules]
-    
-    subgraph Android Components
-        D --> H[Activity Lifecycle]
-        E --> I[Views & Layouts]
-        F --> J[Images & Icons]
+    subgraph Presentation Layer
+        A[Activities] --> B[MainActivity]
+        A --> C[SearchActivity]
+        A --> D[AnalyzeActivity]
+        A --> E[SettingActivity]
+        
+        B --> F[UI Components]
+        C --> F
+        D --> F
+        E --> F
     end
-    
-    subgraph Features
-        G --> K[Timer Feature]
-        G --> L[Kitchen Management]
+
+    subgraph Data Layer
+        G[Room Database] --> H[FoodDao]
+        G --> I[WasteDao]
+        G --> J[EatenDao]
+        
+        H --> K[FoodItem]
+        I --> L[WasteItem]
+        J --> M[EatenItem]
     end
-    
+
+    subgraph Business Logic
+        N[ViewModel] --> O[Food Management]
+        N --> P[Waste Analysis]
+        N --> Q[Search Logic]
+    end
+
+    F --> N
+    N --> G
+
     style A fill:#f9f,stroke:#333,stroke-width:2px
-    style B fill:#bbf,stroke:#333,stroke-width:2px
-    style C fill:#bbf,stroke:#333,stroke-width:2px
+    style G fill:#bbf,stroke:#333,stroke-width:2px
+    style N fill:#bfb,stroke:#333,stroke-width:2px
