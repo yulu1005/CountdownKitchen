@@ -28,7 +28,9 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.util.*
 
 
@@ -42,6 +44,7 @@ class Main : AppCompatActivity() {
     private lateinit var eatenDao: EatenDao
     private val itemList = mutableListOf<FoodItem>()
     private lateinit var adapter: FoodAdapter
+    private lateinit var db: AppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +58,26 @@ class Main : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 1)
+        }
+
+        db = AppDatabase.getDatabase(this)
+
+        val scanButton: ImageButton = findViewById(R.id.scanButton)
+        scanButton.setOnClickListener {
+            IntentIntegrator(this).apply {
+                setOrientationLocked(true)
+                setPrompt("請將 QRCode 對準掃描框")
+                setBeepEnabled(true)
+                initiateScan()
+            }
+        }
+        scanButton.setOnClickListener {
+            IntentIntegrator(this).initiateScan()  // ✅ 啟動掃描器
         }
 
         val database = AppDatabase.getDatabase(this)
@@ -226,7 +249,7 @@ class Main : AppCompatActivity() {
         spinnerCategory.adapter = categoryAdapter
         spinnerCategory.setSelection(categoryOptions.indexOf(item.category))
 
-        val typeOptions = arrayOf("肉類", "蔬菜類","乳品類","水果類", "飲料類", "點心類","熟食","其他")
+        val typeOptions = arrayOf("肉類", "海鮮","蔬菜類","乳品類","水果類", "飲料類", "點心類","熟食","其他")
         val typeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, typeOptions)
         spinnerType.adapter = typeAdapter
         spinnerType.setSelection(typeOptions.indexOf(item.type))
@@ -301,4 +324,43 @@ class Main : AppCompatActivity() {
             }
         }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+        if (result != null && result.contents != null) {
+            try {
+                val json = JSONObject(result.contents)
+
+                val name = json.getString("name")
+                val category = json.optString("category", "")
+                val expiryDate = json.getString("expiryDate")
+                val note = json.optString("note", "")
+                val type = json.optString("type", "")
+
+                val foodItem = FoodItem(
+                    name = name,
+                    category = category,
+                    expiryDate = expiryDate,
+                    note = note,
+                    type = type
+                )
+
+                val db = AppDatabase.getDatabase(this)
+
+                lifecycleScope.launch {
+                    db.foodDao().insert(foodItem)
+                    Toast.makeText(this@Main, "✅ 已新增：$name", Toast.LENGTH_SHORT).show()
+                    refreshItemList()  // ← 如果你要同步畫面
+                }
+
+            } catch (e: Exception) {
+                Toast.makeText(this, "❌ QR 格式錯誤", Toast.LENGTH_SHORT).show()
+                Log.e("QR_ERROR", e.toString())
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
 }
+
