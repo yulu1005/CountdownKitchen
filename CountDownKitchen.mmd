@@ -1,21 +1,26 @@
 graph TD
-  user[User]
-
-  subgraph Android_App
-    mainUI[Main UI]
-    reminder[Reminder Module NotificationManager]
-    scan[Scan Module ZXing]
-    db[Local Database Room DB]
-    apiModule[API Query Module OpenFoodFacts]
-  end
-
-  subgraph External_Resources
-    OFF[Open Food Facts API]
-  end
-
-  user --> mainUI
-  mainUI --> reminder
-  mainUI --> scan
-  mainUI --> db
-  scan --> apiModule
-  apiModule --> OFF
+    A[CountdownKitchen] --> B[app]
+    A --> C[feature]
+    A --> D[docs]
+    
+    B --> E[src]
+    E --> F[MainActivity.kt]
+    E --> G[drawable]
+    
+    subgraph Android App
+        F --> H[UI Components]
+        F --> I[Business Logic]
+    end
+    
+    subgraph Features
+        C --> J[Feature Modules]
+    end
+    
+    subgraph Documentation
+        D --> K[Project Docs]
+    end
+    
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style B fill:#bbf,stroke:#333,stroke-width:2px
+    style C fill:#bbf,stroke:#333,stroke-width:2px
+    style D fill:#bbf,stroke:#333,stroke-width:2px
