@@ -4,11 +4,14 @@ graph TD
         A --> C[SearchActivity]
         A --> D[AnalyzeActivity]
         A --> E[SettingActivity]
+        A --> V[CameraActivity]
         
         B --> F[UI Components]
         C --> F
         D --> F
         E --> F
+        V --> W[Camera Preview]
+        V --> X[QR Scanner]
     end
 
     subgraph Data Layer
@@ -25,11 +28,22 @@ graph TD
         N[ViewModel] --> O[Food Management]
         N --> P[Waste Analysis]
         N --> Q[Search Logic]
+        N --> R[QR Code Processing]
+    end
+
+    subgraph External APIs
+        S[Android Camera API] --> T[Camera Features]
+        U[ZXing Library] --> Y[QR Code Decoding]
     end
 
     F --> N
     N --> G
+    V --> S
+    V --> U
+    Y --> R
 
     style A fill:#f9f,stroke:#333,stroke-width:2px
     style G fill:#bbf,stroke:#333,stroke-width:2px
     style N fill:#bfb,stroke:#333,stroke-width:2px
+    style S fill:#fbb,stroke:#333,stroke-width:2px
+    style U fill:#fbb,stroke:#333,stroke-width:2px
