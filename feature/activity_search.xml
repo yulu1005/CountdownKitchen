@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:fitsSystemWindows="true"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".SearchMainActivity">
+
+    <!-- 搜尋欄 -->
+    <EditText
+        android:id="@+id/search_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="請輸入食材名稱"
+        android:padding="12dp"
+        android:background="@android:drawable/edit_text"
+        android:textColor="#000000"
+        android:textSize="16sp" />
+
+    <!-- 搜尋結果列表 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="594dp"
+        android:layout_marginTop="12dp"
+        android:layout_weight="1" />
+
+    <!-- 返回按鈕 -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="24dp"
+        android:clickable="true"
+        android:contentDescription="返回"
+        app:backgroundTint="#86BFFF"
+        app:iconSize="100dp"
+        app:srcCompat="@drawable/ic_keyboard_backspace"
+        app:tint="@android:color/white" />
+
+</LinearLayout>

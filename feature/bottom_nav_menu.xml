@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_reminder"
+        android:icon="@drawable/ic_alarm"
+        android:title="提醒" />
+    <item
+        android:id="@+id/nav_stats"
+        android:icon="@drawable/ic_chart"
+        android:title="統計" />
+    <item
+        android:id="@+id/nav_search"
+        android:icon="@drawable/ic_search"
+        android:title="搜尋" />
+</menu>

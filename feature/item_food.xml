@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    card_view:cardCornerRadius="16dp"
+    card_view:cardElevation="6dp">
+
+    <RelativeLayout
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="食材名稱"
+            android:textStyle="bold"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/tvCategory"
+            android:layout_below="@id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="分類：" />
+
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_below="@id/tvCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="到期日：" />
+
+        <TextView
+            android:id="@+id/tvNote"
+            android:layout_below="@id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="備註：" />
+
+        <LinearLayout
+            android:id="@+id/action_buttons"
+            android:orientation="horizontal"
+            android:layout_below="@id/tvNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/btn_edit"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginHorizontal="2dp"
+                android:background="@drawable/bg_round_button"
+                android:src="@drawable/ic_edit"
+                android:contentDescription="編輯" />
+
+            <ImageButton
+                android:id="@+id/btn_trash"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginHorizontal="2dp"
+                android:background="@drawable/bg_round_button"
+                android:src="@drawable/ic_trash"
+                android:contentDescription="廚餘" />
+
+            <ImageButton
+                android:id="@+id/btn_eat"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginHorizontal="2dp"
+                android:background="@drawable/bg_round_button"
+                android:src="@drawable/ic_eat"
+                android:contentDescription="吃掉" />
+
+            <ImageButton
+                android:id="@+id/btn_delete"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginHorizontal="2dp"
+                android:background="@drawable/bg_round_button"
+                android:src="@drawable/ic_delete"
+                android:contentDescription="刪除" />
+        </LinearLayout>
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>
