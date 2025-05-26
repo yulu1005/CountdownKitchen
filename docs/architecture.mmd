@@ -1,5 +1,5 @@
 graph TD
-    subgraph Presentation_Layer  %% 表示層
+    subgraph Presentation Layer
         A[Activities] --> B[MainActivity]
         A --> C[SearchActivity]
         A --> D[AnalyzeActivity]
@@ -14,8 +14,8 @@ graph TD
         V --> X[QR Scanner]
     end
 
-    subgraph Data_Layer  %% 資料層
-        G[Room DB] --> H[FoodDao]
+    subgraph Data Layer
+        G[Room Database] --> H[FoodDao]
         G --> I[WasteDao]
         G --> J[EatenDao]
         
@@ -24,14 +24,14 @@ graph TD
         J --> M[EatenItem]
     end
 
-    subgraph Business_Logic  %% 商業邏輯層
+    subgraph Business Logic
         N[ViewModel] --> O[Food Management]
         N --> P[Waste Analysis]
         N --> Q[Search Logic]
         N --> R[QR Code Processing]
     end
 
-    subgraph External_APIs  %% 外部 API
+    subgraph External APIs
         S[Android Camera API] --> T[Camera Features]
         U[ZXing Library] --> Y[QR Code Decoding]
     end
