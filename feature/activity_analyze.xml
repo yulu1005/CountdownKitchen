@@ -48,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="已刪除之食品"
+                android:text="已完食/廚餘/刪除之食品"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
