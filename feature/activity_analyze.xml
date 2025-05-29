@@ -1,71 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:background="@drawable/bg1"
     android:orientation="vertical"
-    android:padding="16dp"
-    tools:context=".AnalyzeActivity">
+    android:fitsSystemWindows="false"
+    android:background="@drawable/bg1"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".SearchActivity">
 
-    <ScrollView
-        android:id="@+id/scrollContent"
-        android:layout_width="match_parent"
-        android:layout_height="635dp"
-        android:layout_weight="1">
+    <!-- 搜尋類型選擇 -->
 
-        <LinearLayout
-            android:layout_width="match_parent"
+    <!-- 搜尋欄 -->
+
+    <!-- 日期選擇器（初始隱藏） -->
+
+    <RadioGroup
+        android:id="@+id/searchTypeGroup"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="15dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radioName"
+            android:layout_width="123dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="8dp">
+            android:checked="true"
+            android:text="名稱搜尋" />
 
-            <!-- 第一部分 -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="浪費比例"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+        <RadioButton
+            android:id="@+id/radioDate"
+            android:layout_width="123dp"
+            android:layout_height="wrap_content"
+            android:text="到期日搜尋" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginVertical="8dp"
-                android:background="#CCCCCC" />
+        <RadioButton
+            android:id="@+id/radioType"
+            android:layout_width="126dp"
+            android:layout_height="match_parent"
+            android:text="類型搜尋" />
+    </RadioGroup>
 
-            <com.github.mikephil.charting.charts.PieChart
-                android:id="@+id/pie_chart"
-                android:layout_width="match_parent"
-                android:layout_height="272dp"
-                android:layout_marginVertical="16dp" />
+    <EditText
+        android:id="@+id/search_input"
+        android:layout_width="345dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@android:drawable/edit_text"
+        android:hint="請輸入食材名稱"
+        android:textColor="#000000"
+        android:textSize="16sp" />
 
-            <!-- 第二部分 -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="已刪除之食品"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+    <LinearLayout
+        android:id="@+id/datePickerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        >
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginVertical="8dp"
-                android:background="#CCCCCC" />
+        <EditText
+            android:id="@+id/date_input"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="16dp" />
-        </LinearLayout>
-    </ScrollView>
+            android:layout_marginStart="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:hint="請選擇日期 (YYYY-MM-DD)"
+            android:padding="12dp"
+            android:background="@android:drawable/edit_text"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:focusable="true" />
 
+        <ImageButton
+            android:id="@+id/btn_calendar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_my_calendar"
+            android:contentDescription="選擇日期" />
+    </LinearLayout>
+
+    <!-- 類型選擇器（初始隱藏） -->
+    <Spinner
+        android:id="@+id/type_spinner"
+        android:layout_width="345dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:padding="12dp"
+        android:background="@android:drawable/edit_text" />
+
+    <!-- 搜尋結果列表 -->
+
+    <!-- 返回按鈕 -->
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/fab_add"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="bottom|start"-->
+<!--        android:layout_margin="24dp"-->
+<!--        android:clickable="true"-->
+<!--        android:contentDescription="返回"-->
+<!--        app:backgroundTint="#86BFFF"-->
+<!--        app:iconSize="100dp"-->
+<!--        app:srcCompat="@drawable/ic_keyboard_backspace"-->
+<!--        app:tint="@android:color/white" />-->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="462dp"
+        android:layout_marginTop="12dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:layout_weight="1" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
@@ -81,4 +137,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/bottom_nav_menu" />
+
 </LinearLayout>
