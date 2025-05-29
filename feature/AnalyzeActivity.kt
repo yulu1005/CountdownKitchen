@@ -1,6 +1,6 @@
 package com.example.smartfridgeassistant
 
-// 🔹 1. 匯入所需套件
+// 🔹 匯入套件
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -16,71 +16,79 @@ import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
-import com.github.mikephil.charting.formatter.ValueFormatter
 
 class AnalyzeActivity : AppCompatActivity() {
 
-    // 🔹 2. 宣告 DAO 與資料與畫面元件變數
+    // 🔹 資料庫存取物件（DAO）
     private lateinit var wasteDao: WasteDao
     private lateinit var eatenDao: EatenDao
     private lateinit var foodDao: FoodDao
+    private lateinit var deletedDao: DeletedDao
+
+    // 🔹 食材紀錄清單與 Adapter
     private val outList = mutableListOf<OutItem>()
     private lateinit var outAdapter: OutItemAdapter
+
+    // 🔹 圓餅圖元件
     private lateinit var pieChart: PieChart
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge() // 支援全螢幕邊緣顯示
         setContentView(R.layout.activity_analyze)
 
-        // 🔹 3. 設定狀態列邊距調整（避免被擋住）
+        // 🔹 避免畫面元素被系統狀態列或導航列擋住
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        // 🔹 4. 初始化資料庫 DAO
+        // 🔹 初始化 DAO
         val database = AppDatabase.getDatabase(this)
         wasteDao = database.wasteDao()
         eatenDao = database.eatenDao()
         foodDao = database.foodDao()
+        deletedDao = database.deletedDao()
 
-        // 🔹 5. 初始化圓餅圖 PieChart
+        // 🔹 初始化 PieChart
         pieChart = findViewById(R.id.pie_chart)
 
-        // 🔹 6. 初始化 RecyclerView 與 Adapter
+        // 🔹 初始化 RecyclerView
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         outAdapter = OutItemAdapter(outList) { item ->
-
-            // ✅ 點擊「返回主列表」按鈕處理邏輯（將資料從廚餘或完食移回主表）
+            // 🔁 點擊返回按鈕時，將資料從「廚餘 / 完食 / 刪除」移回主食材資料表
             lifecycleScope.launch {
                 when (item.state) {
                     "廚餘" -> {
-                        val wasteItems = wasteDao.getAll()
-                        val wasteItem = wasteItems.find { it.name == item.name }
+                        val wasteItem = wasteDao.getAll().find { it.name == item.name }
                         wasteItem?.let { wasteDao.delete(it) }
                     }
                     "完食" -> {
-                        val eatenItems = eatenDao.getAll()
-                        val eatenItem = eatenItems.find { it.name == item.name }
+                        val eatenItem = eatenDao.getAll().find { it.name == item.name }
                         eatenItem?.let { eatenDao.delete(it) }
+                    }
+                    "已刪除" -> {
+                        val deletedItem = deletedDao.getAll().find { it.name == item.name }
+                        deletedItem?.let { deletedDao.delete(it) }
                     }
                 }
 
-                // ✅ 新增回 Food 表（預設分類為冷藏）
-                foodDao.insert(FoodItem(
-                    name = item.name,
-                    category = "冷藏",
-                    expiryDate = item.date,
-                    note = item.note,
-                    type = item.type
-                ))
+                // ➕ 插入回主食材資料表
+                foodDao.insert(
+                    FoodItem(
+                        name = item.name,
+                        category = item.category,
+                        expiryDate = item.date,
+                        note = item.note,
+                        type = item.type
+                    )
+                )
 
-                // ✅ 重新整理列表與圖表
+                // 🔄 重新整理畫面
                 refreshList()
             }
         }
@@ -88,32 +96,44 @@ class AnalyzeActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = outAdapter
 
-        // 🔹 7. 初次載入資料與更新畫面
+        // 🔃 初次載入資料
         refreshList()
 
-        // 🔹 8. 啟用底部導覽列（分析頁高亮）
+        // 🔻 啟用底部導覽列（目前高亮顯示分析頁）
         setupBottomNav(this, R.id.nav_analyze)
     }
 
-    // 🔹 9. 重新整理廚餘與完食紀錄，同步更新 RecyclerView 與 PieChart
+    // 🔁 載入所有「已出庫資料」並更新畫面與圓餅圖
     private fun refreshList() {
         lifecycleScope.launch {
             try {
+                // 🔄 取得三個資料表的資料
                 val wasteList = wasteDao.getAll()
                 val eatenList = eatenDao.getAll()
+                val deletedList = deletedDao.getAll()
 
-                // ✅ 整合資料進 outList，依日期排序
                 outList.clear()
-                wasteList.forEach { waste ->
-                    outList.add(OutItem(waste.name, "廚餘", waste.date, waste.category, waste.type, waste.note))
+
+                // ➕ 將廚餘資料加入清單
+                wasteList.forEach {
+                    outList.add(OutItem(it.name, "廚餘", it.date, it.category, it.type, it.note))
                 }
-                eatenList.forEach { eaten ->
-                    outList.add(OutItem(eaten.name, "完食", eaten.date, eaten.category, eaten.type, eaten.note))
+
+                // ➕ 將完食資料加入清單
+                eatenList.forEach {
+                    outList.add(OutItem(it.name, "完食", it.date, it.category, it.type, it.note))
                 }
+
+                // ➕ 將已刪除資料加入清單
+                deletedList.forEach {
+                    outList.add(OutItem(it.name, "已刪除", it.expiryDate, it.category, it.type, it.note))
+                }
+
+                // 🔃 根據日期由新到舊排序
                 outList.sortByDescending { it.date }
                 outAdapter.notifyDataSetChanged()
 
-                // ✅ 更新圓餅圖數據
+                // 🔢 更新圖表資料
                 val dataMap = mapOf(
                     "廚餘" to wasteList.size,
                     "完食" to eatenList.size
@@ -126,14 +146,14 @@ class AnalyzeActivity : AppCompatActivity() {
         }
     }
 
-    // 🔹 10. 設定並顯示圓餅圖 PieChart
+    // 🔷 設定 PieChart 圓餅圖顯示樣式
     private fun setupPieChart(dataMap: Map<String, Int>) {
         val entries = ArrayList<PieEntry>()
         dataMap.forEach { (label, value) ->
             if (value > 0) entries.add(PieEntry(value.toFloat(), label))
         }
 
-        // ✅ 自訂顯示百分比格式
+        // ✅ 顯示整數百分比格式
         class IntPercentFormatter : ValueFormatter() {
             override fun getFormattedValue(value: Float): String {
                 return "${value.toInt()}%"
@@ -141,14 +161,17 @@ class AnalyzeActivity : AppCompatActivity() {
         }
 
         val dataSet = PieDataSet(entries, "浪費概況")
-        dataSet.colors = listOf(Color.parseColor("#86BFFF"), Color.parseColor("#FFF59D"))
+        dataSet.colors = listOf(
+            Color.parseColor("#86BFFF"), // 廚餘藍
+            Color.parseColor("#FFF59D")  // 完食黃
+        )
         dataSet.valueTextSize = 16f
         dataSet.valueTextColor = Color.DKGRAY
-        val data = PieData(dataSet)
 
-        // ✅ 設定 PieChart 顯示樣式
-        pieChart.setUsePercentValues(true)
+        val data = PieData(dataSet)
         data.setValueFormatter(IntPercentFormatter())
+
+        pieChart.setUsePercentValues(true)
         pieChart.data = data
         pieChart.description.isEnabled = false
         pieChart.centerText = "浪費比例"
@@ -157,7 +180,7 @@ class AnalyzeActivity : AppCompatActivity() {
         pieChart.animateY(1000)
         pieChart.invalidate()
 
-        // ✅ 設定圖例樣式
+        // 📊 設定圖例樣式
         val legend = pieChart.legend
         legend.textSize = 14f
         legend.formSize = 12f
