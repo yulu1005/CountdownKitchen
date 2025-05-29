@@ -143,22 +143,22 @@ class Main : AppCompatActivity() {
         recyclerView.layoutManager = GridLayoutManager(this, 2)
         recyclerView.adapter = adapter
 
-        // 🔹 9. 排序 Spinner：預設 / 名稱排序 / 到期日排序
+        // 🔹 9. 排序 Spinner：預設 / 到期日排序
         val sortSpinner = findViewById<Spinner>(R.id.spinner)
         val sortOptions = arrayOf("預設", "到期日近到遠", "到期日遠到近")
         val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, sortOptions)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         sortSpinner.adapter = spinnerAdapter
+
         sortSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 when (position) {
-                    1 -> itemList.sortBy { it.name.lowercase() }
-                    2 -> itemList.sortByDescending { it.name.lowercase() }
-                    3 -> itemList.sortBy { it.expiryDate }
-                    4 -> itemList.sortByDescending { it.expiryDate }
+                    1 -> itemList.sortBy { it.expiryDate }             // 近 → 遠
+                    2 -> itemList.sortByDescending { it.expiryDate }   // 遠 → 近
                 }
                 adapter.notifyDataSetChanged()
             }
+
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
