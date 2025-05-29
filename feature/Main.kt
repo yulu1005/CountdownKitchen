@@ -109,7 +109,7 @@ class Main : AppCompatActivity() {
         adapter = FoodAdapter(
             itemList = itemList,
             onItemClick = { foodItem -> showEditDialog(foodItem) },
-            onDeleteItem = { foodItem -> lifecycleScope.launch { dao.delete(foodItem); refreshItemList() } },
+            onDeleteItem = { /* 你可以留空，因為刪除已改寫在 Adapter 裡 */ },
             onTrashItem = { foodItem ->
                 lifecycleScope.launch {
                     wasteDao.insert(WasteItem(name = foodItem.name,
@@ -123,23 +123,29 @@ class Main : AppCompatActivity() {
             },
             onEatItem = { foodItem ->
                 lifecycleScope.launch {
-                    eatenDao.insert(EatenItem(
-                        name = foodItem.name,
-                        category = foodItem.category,
-                        note = foodItem.note,
-                        type = foodItem.type,
-                        date = foodItem.expiryDate))
+                    eatenDao.insert(
+                        EatenItem(
+                            name = foodItem.name,
+                            category = foodItem.category,
+                            note = foodItem.note,
+                            type = foodItem.type,
+                            date = foodItem.expiryDate
+                        )
+                    )
                     dao.delete(foodItem)
                     refreshItemList()
                 }
-            }
+            },
+            foodDao = dao,
+            deletedDao = db.deletedDao(),
+            refreshCallback = { refreshItemList() }
         )
         recyclerView.layoutManager = GridLayoutManager(this, 2)
         recyclerView.adapter = adapter
 
         // 🔹 9. 排序 Spinner：預設 / 名稱排序 / 到期日排序
         val sortSpinner = findViewById<Spinner>(R.id.spinner)
-        val sortOptions = arrayOf("預設", "A~Z", "Z~A", "到期日近到遠", "到期日遠到近")
+        val sortOptions = arrayOf("預設", "到期日近到遠", "到期日遠到近")
         val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, sortOptions)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         sortSpinner.adapter = spinnerAdapter
