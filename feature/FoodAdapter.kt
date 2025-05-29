@@ -11,6 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+
 
 // ➤ 食材 RecyclerView 的 Adapter
 class FoodAdapter(
@@ -19,7 +22,10 @@ class FoodAdapter(
     private val onDeleteItem: (FoodItem) -> Unit,             // 刪除功能 callback
     private val onTrashItem: (FoodItem) -> Unit,              // 廚餘功能 callback
     private val onEatItem: (FoodItem) -> Unit,                // 吃掉功能 callback
-    private var expandedPosition: Int? = null                 // 當前展開的卡片位置
+    private var expandedPosition: Int? = null,
+    private val deletedDao: DeletedDao,
+    private val refreshCallback: () -> Unit,
+    private val foodDao: FoodDao,
 ) : RecyclerView.Adapter<FoodAdapter.FoodViewHolder>() {
 
     // ➤ 記錄展開狀態的卡片位置集合（備用）
@@ -114,13 +120,28 @@ class FoodAdapter(
         }
 
         holder.btnDelete.setOnClickListener {
-            val position = holder.adapterPosition
-            if (position != RecyclerView.NO_POSITION) {
-                val item = itemList[position]
-                onDeleteItem(item) // 呼叫刪除邏輯
-                itemList.removeAt(position)
-                notifyItemRemoved(position)
-                notifyItemRangeChanged(position, itemList.size)
+            val pos = holder.adapterPosition
+            if (pos != RecyclerView.NO_POSITION) {
+                // ➤ 將資料移入 deleted_table 而不是直接刪除
+                CoroutineScope(Dispatchers.IO).launch {
+                    val deletedItem = DeletedItem(
+                        name = item.name,
+                        category = item.category,
+                        type = item.type,
+                        expiryDate = item.expiryDate,
+                        note = item.note
+                    )
+                    deletedDao.insert(deletedItem)
+                    foodDao.delete(item)
+
+                    // 從畫面移除
+                    CoroutineScope(Dispatchers.Main).launch {
+                        itemList.removeAt(pos)
+                        notifyItemRemoved(pos)
+                        notifyItemRangeChanged(pos, itemList.size)
+                        refreshCallback()
+                    }
+                }
             }
         }
     }
