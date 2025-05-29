@@ -32,3 +32,13 @@ data class EatenItem(
     val type: String,      // ➤ 類型
     val date: String       // ➤ 完食日期
 )
+
+@Entity(tableName = "deleted_table")
+data class DeletedItem(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val name: String,
+    val category: String,
+    val type: String,
+    val expiryDate: String,
+    val note: String
+)
