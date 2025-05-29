@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingActivity">
+    android:fitsSystemWindows="true"
+    android:background="@drawable/bg1"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".AnalyzeActivity">
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/scrollContent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="635dp"
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="18dp">
+            android:padding="8dp">
 
-            <!-- 第一部分：浪費比例 -->
+            <!-- 第一部分 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -33,15 +37,13 @@
                 android:layout_marginVertical="8dp"
                 android:background="#CCCCCC" />
 
-            <!-- 圓餅圖 Placeholder（可改成真正的 PieChart 元件） -->
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/pie_chart"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp" />
+                android:layout_height="272dp"
+                android:layout_marginVertical="16dp" />
 
-            <!-- 第二部分：已刪除之食品 -->
+            <!-- 第二部分 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -59,24 +61,24 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="300dp" />
-
-            <!-- 動態列表顯示區域 -->
-
-
+                android:layout_height="match_parent"
+                android:layout_marginBottom="16dp" />
         </LinearLayout>
+    </ScrollView>
 
-    </LinearLayout>
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add"
-        android:layout_width="wrap_content"
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:layout_margin="24dp"
-        android:clickable="true"
-        android:contentDescription="返回"
-        app:backgroundTint="#86BFFF"
-        app:iconSize="100dp"
-        app:srcCompat="@drawable/ic_keyboard_backspace"
-        app:tint="@android:color/white" />
-</FrameLayout>
+        android:background="?android:attr/windowBackground"
+        app:itemIconSize="30dp"
+        app:itemPaddingBottom="3dp"
+        app:itemPaddingTop="12dp"
+        app:itemTextAppearanceActive="@style/BottomNavTextStyle"
+        app:itemTextAppearanceInactive="@style/BottomNavTextStyle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
+</LinearLayout>
