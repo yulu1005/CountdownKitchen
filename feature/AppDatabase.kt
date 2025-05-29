@@ -6,8 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [FoodItem::class, WasteItem::class, EatenItem::class],
-    version = 2,  // ← 確保你有改成大於原本的版本（1 → 2）
+    entities = [
+        FoodItem::class,
+        WasteItem::class,
+        EatenItem::class,
+        DeletedItem::class
+    ],
+    version = 3,  // ← 確保你有改成大於原本的版本（1 → 2）
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -15,6 +20,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun foodDao(): FoodDao
     abstract fun wasteDao(): WasteDao
     abstract fun eatenDao(): EatenDao
+    abstract fun deletedDao(): DeletedDao
 
     companion object {
         @Volatile
