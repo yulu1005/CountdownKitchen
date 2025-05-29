@@ -57,3 +57,17 @@ interface EatenDao {
     @Delete
     suspend fun delete(item: EatenItem)
 }
+@Dao
+interface DeletedDao {
+    // ➤ 新增一筆刪除記錄
+    @Insert
+    suspend fun insert(item: DeletedItem)
+
+    // ➤ 查詢所有刪除記錄
+    @Query("SELECT * FROM deleted_table")
+    suspend fun getAll(): List<DeletedItem>
+
+    // ➤ 刪除某筆刪除記錄
+    @Delete
+    suspend fun delete(item: DeletedItem)
+}
