@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p align="right">
   <img src="assets/logo.png" width="120" alt="倒數計食 Logo">
 </p>
@@ -7,6 +8,15 @@
 一款結合提醒、分類與視覺化的 **食材管理 Android App**，協助使用者掌握冰箱庫存、減少食物浪費，實踐永續生活。
 
 ---
+=======
+<div style="display: flex; align-items: right; gap: 20px;">
+  <div>
+    <h1>倒數計食 CountdownKitchen</h1>
+    <p>一款結合提醒、分類與視覺化的 <strong>食材管理 Android App</strong>，協助使用者掌握冰箱庫存、減少食物浪費，實踐永續生活。</p>
+  </div>
+  <img src="assets/logo.png" width="120" alt="倒數計食 Logo">
+</div>
+>>>>>>> 953d4c76a51bad21ab3082a0cb18079f6b147886
 
 ## 功能特色
 
@@ -28,6 +38,7 @@
 - **MVVM 架構設計**
 - **通知推播機制（BroadcastReceiver）**
 - **QRCode 掃描（ZXing 整合）**
+<<<<<<< HEAD
 
 ---
 
@@ -54,6 +65,8 @@ CountdownKitchen/
 ├── build.gradle
 └── docs/ # 團隊報告與甘特圖（非程式碼）
 
+=======
+>>>>>>> 953d4c76a51bad21ab3082a0cb18079f6b147886
 ---
 
 ## 團隊分工
