@@ -5,6 +5,7 @@
   </div>
   <img src="assets/logo.png" width="120" alt="倒數計食 Logo">
 </div>
+
 ## 功能特色
 
 | 類別 | 功能說明 |
