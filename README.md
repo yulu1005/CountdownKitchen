@@ -1,13 +1,9 @@
-<p align="right">
-  <img src="assets/logo.png" width="120" alt="倒數計食 Logo">
-</p>
-
 # 倒數計食 CountdownKitchen
 
 一款結合提醒、分類與視覺化的 **食材管理 Android App**，協助使用者掌握冰箱庫存、減少食物浪費，實踐永續生活。
 
 ---
-=======
+
 <div style="display: flex; align-items: right; gap: 20px;">
   <div>
     <h1>倒數計食 CountdownKitchen</h1>
@@ -15,7 +11,7 @@
   </div>
   <img src="assets/logo.png" width="120" alt="倒數計食 Logo">
 </div>
->>>>>>> 953d4c76a51bad21ab3082a0cb18079f6b147886
+
 
 ## 功能特色
 
