@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <p align="right">
   <img src="assets/logo.png" width="120" alt="倒數計食 Logo">
 </p>
@@ -38,8 +37,6 @@
 - **MVVM 架構設計**
 - **通知推播機制（BroadcastReceiver）**
 - **QRCode 掃描（ZXing 整合）**
-<<<<<<< HEAD
-
 ---
 
 ## 專案結構
@@ -65,8 +62,6 @@ CountdownKitchen/
 ├── build.gradle
 └── docs/ # 團隊報告與甘特圖（非程式碼）
 
-=======
->>>>>>> 953d4c76a51bad21ab3082a0cb18079f6b147886
 ---
 
 ## 團隊分工
