@@ -1,4 +1,4 @@
-<div style="display: flex; align-items: center; gap: 20px;">
+<div style="display: flex; align-items: right; gap: 20px;">
   <div>
     <h1>倒數計食 CountdownKitchen</h1>
     <p>一款結合提醒、分類與視覺化的 <strong>食材管理 Android App</strong>，協助使用者掌握冰箱庫存、減少食物浪費，實踐永續生活。</p>
