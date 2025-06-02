@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="BottomNavTextStyle" parent="TextAppearance.AppCompat.Caption">
-        <item name="android:textSize">14dp</item>
-
-    </style>
-</resources>

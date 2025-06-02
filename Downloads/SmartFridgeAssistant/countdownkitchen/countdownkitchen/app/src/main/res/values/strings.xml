@@ -1,5 +1,0 @@
-<resources>
-    <string name="app_name">Smart Fridge Assistant</string>
-    <string name="item_name_prompt">請選擇名稱</string>
-    <string name="item_category_prompt">請選擇分類</string>
-</resources>
