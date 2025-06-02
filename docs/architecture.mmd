@@ -18,32 +18,34 @@ graph TD
         G[Room Database] --> H[FoodDao]
         G --> I[WasteDao]
         G --> J[EatenDao]
+        G --> K[DeletedDao]
         
-        H --> K[FoodItem]
-        I --> L[WasteItem]
-        J --> M[EatenItem]
+        H --> L[FoodItem]
+        I --> M[WasteItem]
+        J --> N[EatenItem]
+        K --> O[DeletedItem]
     end
 
     subgraph Business Logic
-        N[ViewModel] --> O[Food Management]
-        N --> P[Waste Analysis]
-        N --> Q[Search Logic]
-        N --> R[QR Code Processing]
+        P[ViewModel] --> Q[Food Management]
+        P --> R[Waste Analysis]
+        P --> S[Search Logic]
+        P --> T[QR Code Processing]
     end
 
     subgraph External APIs
-        S[Android Camera API] --> T[Camera Features]
-        U[ZXing Library] --> Y[QR Code Decoding]
+        U[Android Camera API] --> V[Camera Features]
+        W[ZXing Library] --> X[QR Code Decoding]
     end
 
-    F --> N
-    N --> G
-    V --> S
+    F --> P
+    P --> G
     V --> U
-    Y --> R
+    X --> W
+    X --> T
 
     style A fill:#f9f,stroke:#333,stroke-width:2px
     style G fill:#bbf,stroke:#333,stroke-width:2px
-    style N fill:#bfb,stroke:#333,stroke-width:2px
-    style S fill:#fbb,stroke:#333,stroke-width:2px
+    style P fill:#bfb,stroke:#333,stroke-width:2px
     style U fill:#fbb,stroke:#333,stroke-width:2px
+    style W fill:#fbb,stroke:#333,stroke-width:2px
