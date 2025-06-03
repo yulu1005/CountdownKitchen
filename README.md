@@ -1,4 +1,4 @@
-# 倒數計食 CountdownKitchen
+# 倒數計食 CountDownKitchen
 
 一款結合提醒、分類與視覺化的 **食材管理 Android App**，協助使用者掌握冰箱庫存、減少食物浪費，實踐永續生活。
 
