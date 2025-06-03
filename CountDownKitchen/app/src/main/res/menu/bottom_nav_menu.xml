@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/dc_home"
+        android:title="首頁" />
+    <item
+        android:id="@+id/nav_setting"
+        android:icon="@drawable/dc_time"
+        android:title="提醒" />
+    <item
+        android:id="@+id/nav_analyze"
+        android:icon="@drawable/ic_chart"
+        android:title="統計" />
+    <item
+        android:id="@+id/nav_search"
+        android:icon="@drawable/dc_search"
+        android:title="搜尋" />
+</menu>
