@@ -77,7 +77,7 @@ class FoodAdapter(
 
         val backgroundColor = when {
             daysUntilExpiry < 0 -> R.color.card_light_gray     // 已過期
-            daysUntilExpiry <= 1 -> R.color.card_light_red     // 即將過期
+            daysUntilExpiry < 1 -> R.color.card_light_red     // 即將過期
             daysUntilExpiry <= 7 -> R.color.card_light_blue    // 快到期
             else -> R.color.card_white                         // 安全
         }
