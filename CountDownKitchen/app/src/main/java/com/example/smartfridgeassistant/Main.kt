@@ -174,7 +174,7 @@ class Main : AppCompatActivity() {
             val chipGroup = dialogView.findViewById<ChipGroup>(R.id.chip_group)
             val saveButton = dialogView.findViewById<Button>(R.id.btn_save)
 
-            val categoryOptions = arrayOf("冷藏", "冷凍", "常溫")
+            val categoryOptions = arrayOf("冷藏", "冷凍")
             categorySpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, categoryOptions)
 
             var selectedType = ""
@@ -221,115 +221,4 @@ class Main : AppCompatActivity() {
         val etName = dialogView.findViewById<EditText>(R.id.et_name)
         val etNote = dialogView.findViewById<EditText>(R.id.et_note)
         val spinnerCategory = dialogView.findViewById<Spinner>(R.id.spinner_category)
-        val spinnerType = dialogView.findViewById<Spinner>(R.id.spinner_type)
-        val tvDate = dialogView.findViewById<TextView>(R.id.tv_expiry_date)
-        val btnDone = dialogView.findViewById<Button>(R.id.btn_done)
-
-        etName.setText(item.name)
-        etNote.setText(item.note)
-        tvDate.text = item.expiryDate
-
-        val categoryOptions = arrayOf("冷藏", "冷凍", "常溫")
-        spinnerCategory.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, categoryOptions)
-        spinnerCategory.setSelection(categoryOptions.indexOf(item.category))
-
-        val typeOptions = arrayOf("肉類", "海鮮類","蔬菜類","乳品類","水果類", "飲料類", "點心類","熟食","其他")
-        spinnerType.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, typeOptions)
-        spinnerType.setSelection(typeOptions.indexOf(item.type))
-
-        tvDate.setOnClickListener {
-            val datePicker = MaterialDatePicker.Builder.datePicker().setTitleText("選擇到期日").build()
-            datePicker.show(this@Main.supportFragmentManager, "EDIT_DATE_PICKER")
-            datePicker.addOnPositiveButtonClickListener {
-                val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                tvDate.text = sdf.format(Date(it))
-            }
-        }
-
-        btnDone.setOnClickListener {
-            val newItem = item.copy(
-                name = etName.text.toString(),
-                note = etNote.text.toString(),
-                category = spinnerCategory.selectedItem.toString(),
-                type = spinnerType.selectedItem.toString(),
-                expiryDate = tvDate.text.toString()
-            )
-            lifecycleScope.launch {
-                dao.update(newItem)
-                refreshItemList()
-            }
-            dialog.dismiss()
-        }
-        dialog.show()
-    }
-
-    // 🔹 13. 刷新畫面資料
-    private fun refreshItemList() {
-        lifecycleScope.launch {
-            val data = dao.getAll()
-            itemList.clear()
-            itemList.addAll(data)
-            adapter.notifyDataSetChanged()
-        }
-    }
-
-    // 🔹 14. 檢查通知權限（Android 13+）
-    private fun checkNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    NOTIFICATION_PERMISSION_CODE
-                )
-            }
-        }
-    }
-
-    // 🔹 15. 處理權限請求回傳結果
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == NOTIFICATION_PERMISSION_CODE) {
-            Toast.makeText(
-                this,
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    "通知權限已授予" else "需要通知權限才能接收提醒",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
-
-    // 🔹 16. 處理掃描 QRCode 結果並寫入資料庫
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (result != null && result.contents != null) {
-            try {
-                val json = JSONObject(result.contents)
-                val foodItem = FoodItem(
-                    name = json.getString("name"),
-                    category = json.optString("category", ""),
-                    expiryDate = json.getString("expiryDate"),
-                    note = json.optString("note", ""),
-                    type = json.optString("type", "")
-                )
-                val db = AppDatabase.getDatabase(this)
-                lifecycleScope.launch {
-                    db.foodDao().insert(foodItem)
-                    Toast.makeText(this@Main, "✅ 已新增：${foodItem.name}", Toast.LENGTH_SHORT).show()
-                    refreshItemList()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(this, "❌ QR 格式錯誤", Toast.LENGTH_SHORT).show()
-                Log.e("QR_ERROR", e.toString())
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-}
+        val spinnerType = dialogView.findViewB
