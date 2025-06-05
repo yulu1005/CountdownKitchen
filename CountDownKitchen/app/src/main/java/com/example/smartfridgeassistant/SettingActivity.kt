@@ -1,150 +1,127 @@
 package com.example.smartfridgeassistant
 
-// 🔹 1. 匯入所需的套件
+// 🔸 匯入必要套件
 import android.Manifest
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.*
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import android.widget.RadioGroup
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
 
 class SettingActivity : AppCompatActivity() {
 
-    // 🔹 2. 常數：通知權限請求碼
+    // 🔹 定義通知權限請求代碼
     companion object {
         private const val NOTIFICATION_PERMISSION_CODE = 123
     }
 
-    // 🔹 3. 宣告變數
+    // 🔹 宣告所需變數
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var dao: FoodDao
+    private lateinit var adapter: InlineFoodAdapter
+    private var allFoods: List<FoodItem> = emptyList()
+    private var selectedFoodName: String? = null
+    private var reminderTimeDaysBefore: Int = 7  // 預設提醒時間：到期前 7 天
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_setting)
 
-        // 🔹 4. 檢查是否有通知權限
+        // 🔸 檢查是否有通知權限（Android 13+）
         checkNotificationPermission()
 
-        // 🔹 5. 調整系統狀態列的邊距（避免被遮擋）
+        // 🔸 避免系統 UI 遮住畫面內容
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        // 🔹 6. 取得 SharedPreferences 和 DAO
-        sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
+        // 🔸 初始化資料庫、偏好設定
+        sharedPreferences = getSharedPreferences("Reminders", MODE_PRIVATE)
         dao = AppDatabase.getDatabase(this).foodDao()
+        setupBottomNav(this, R.id.nav_setting) // 設定底部導覽列選中狀態
 
-        // 🔹 7. 初始化提醒時間選項（RadioButton 預設勾選）
+        // 🔸 取得元件
+        val inputField = findViewById<EditText>(R.id.editTextText)
+        val recyclerView = findViewById<RecyclerView>(R.id.selected_food_list)
         val radioGroup = findViewById<RadioGroup>(R.id.radio_group_reminder)
-        val savedReminderTime = sharedPreferences.getInt("reminder_time", 0)
-        radioGroup.check(
-            when (savedReminderTime) {
-                0 -> R.id.radio_week_before
-                1 -> R.id.radio_day_before
-                2 -> R.id.radio_same_day
-                else -> R.id.radio_week_before
-            }
-        )
 
-        // 🔹 8. 設定提醒時間選項變更監聽器
-        radioGroup.setOnCheckedChangeListener { _, checkedId ->
-            val reminderTime = when (checkedId) {
-                R.id.radio_week_before -> 0
-                R.id.radio_day_before -> 1
-                R.id.radio_same_day -> 2
-                else -> 0
-            }
-
-            // 存入設定值
-            sharedPreferences.edit().putInt("reminder_time", reminderTime).apply()
-
-            // 檢查並發送通知
-            checkAndSendNotifications(reminderTime)
+        // 🔸 建立 RecyclerView 的自訂 Adapter，點選後自動填入欄位並隱藏建議清單
+        adapter = InlineFoodAdapter { selected ->
+            inputField.setText(selected)
+            selectedFoodName = selected
+            recyclerView.visibility = RecyclerView.GONE
         }
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
 
-        // 🔹 9. 設定底部導覽列（高亮設定頁）
-        setupBottomNav(this, R.id.nav_setting)
-    }
-
-    // 🔹 10. 執行通知檢查與發送邏輯
-    private fun checkAndSendNotifications(reminderTime: Int) {
+        // 🔸 使用 Coroutine 非同步載入資料庫中所有食材
         lifecycleScope.launch {
-            val allFoods = dao.getAll()  // 取得所有食材
-            val currentDate = Calendar.getInstance()
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            allFoods = dao.getAllFoods()
+        }
 
-            // 計算目標日期
-            val targetDate = Calendar.getInstance()
-            targetDate.add(
-                Calendar.DAY_OF_MONTH, when (reminderTime) {
-                    0 -> 7   // 提前一週
-                    1 -> 1   // 提前一天
-                    else -> 0 // 當天
-                }
-            )
-            val targetDateStr = dateFormat.format(targetDate.time)
-
-            // 除錯日誌：顯示目標日期與食材列表
-            Log.d("SettingActivity", "目標日期: $targetDateStr")
-            Log.d("SettingActivity", "所有食品: ${allFoods.map { "${it.name}(${it.type})" }}")
-
-            var notificationSent = false
-
-            // 逐一比對是否有符合條件的食材
-            allFoods.forEach { food ->
-                Log.d("SettingActivity", "檢查食品: ${food.name}, 類型: '${food.type}', 到期日: ${food.expiryDate}")
-
-                val foodExpiryDate = dateFormat.parse(food.expiryDate)
-                val targetDateParsed = dateFormat.parse(targetDateStr)
-
-                if (foodExpiryDate != null && targetDateParsed != null) {
-                    val datesMatch = foodExpiryDate.time == targetDateParsed.time
-                    Log.d("SettingActivity", "日期是否匹配: $datesMatch")
-
-                    if (datesMatch) {
-                        notificationSent = true
-                        NotificationHelper(this@SettingActivity).showExpiryNotification(
-                            food.name,
-                            food.expiryDate
-                        )
-                        Log.d("SettingActivity", "發送通知: ${food.name}")
-                    }
+        // 🔸 當輸入框文字改變時，自動顯示對應的建議清單
+        inputField.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val query = s.toString().trim()
+                if (query.isEmpty()) {
+                    recyclerView.visibility = RecyclerView.GONE
+                } else {
+                    // 🔸 搜尋包含輸入內容的食材名稱
+                    val result = allFoods.map { it.name }
+                        .filter { it.contains(query, ignoreCase = true) }
+                    adapter.updateData(result)
+                    recyclerView.visibility = if (result.isEmpty()) RecyclerView.GONE else RecyclerView.VISIBLE
                 }
             }
 
-            // 若無符合條件者，顯示提示訊息
-            if (!notificationSent) {
-                runOnUiThread {
-                    val message = "沒有找到${
-                        when (reminderTime) {
-                            0 -> "一週後"
-                            1 -> "一天後"
-                            else -> "當天"
-                        }
-                    }過期的食品"
-                    Toast.makeText(this@SettingActivity, message, Toast.LENGTH_SHORT).show()
-                }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        // 🔸 當使用者選擇提醒天數後，儲存到 SharedPreferences
+        radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            reminderTimeDaysBefore = when (checkedId) {
+                R.id.radio_week_before -> 7
+                R.id.radio_day_before -> 1
+                R.id.radio_same_day -> 0
+                else -> 7
+            }
+
+            // 🔸 若已選擇食材，儲存設定
+            if (selectedFoodName != null) {
+                sharedPreferences.edit()
+                    .putInt("reminder_${selectedFoodName}", reminderTimeDaysBefore)
+                    .apply()
+
+                Toast.makeText(
+                    this,
+                    "已設定提醒：${selectedFoodName} 的到期日前 $reminderTimeDaysBefore 天",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(this, "請先選擇食材名稱", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    // 🔹 11. 檢查 Android 13+ 是否已授權通知
+    // 🔸 檢查是否有通知權限（Android 13+ 需要顯式授權）
     private fun checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
@@ -161,7 +138,7 @@ class SettingActivity : AppCompatActivity() {
         }
     }
 
-    // 🔹 12. 接收權限回應的處理
+    // 🔸 接收通知權限回應
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -175,5 +152,42 @@ class SettingActivity : AppCompatActivity() {
                 Toast.makeText(this, "需要通知權限才能接收提醒", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    // 🔹 自訂 RecyclerView Adapter（內嵌於此 Activity）
+    class InlineFoodAdapter(
+        private val onClick: (String) -> Unit
+    ) : RecyclerView.Adapter<InlineFoodAdapter.ViewHolder>() {
+
+        private var data: List<String> = emptyList()
+
+        // 🔸 更新建議列表資料
+        fun updateData(newData: List<String>) {
+            data = newData
+            notifyDataSetChanged()
+        }
+
+        // 🔸 每個項目使用 TextView 顯示
+        inner class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView) {
+            init {
+                textView.setOnClickListener {
+                    onClick(data[adapterPosition])
+                }
+            }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val tv = TextView(parent.context).apply {
+                textSize = 18f
+                setPadding(24, 24, 24, 24)
+            }
+            return ViewHolder(tv)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.textView.text = data[position]
+        }
+
+        override fun getItemCount(): Int = data.size
     }
 }
