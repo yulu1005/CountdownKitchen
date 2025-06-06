@@ -1,15 +1,15 @@
 # 倒數計食 CountDownKitchen
 
 一款結合提醒、分類與視覺化的 **食材管理 Android App**，協助使用者掌握冰箱庫存、減少食物浪費，實踐永續生活。
-Demo:https://www.youtube.com/watch?v=Hi2JoAfnmRE
-簡報:https://www.canva.com/design/DAGoQBi7Li4/jThyTsjbZCsJYJ1LvXEBeA/edit?utm_content=DAGoQBi7Li4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
 ---
 
 <div style="display: flex; align-items: right; gap: 20px;">
   <img src="assets/logo.png" width="120" alt="倒數計食 Logo">
 </div>
 
-
+Demo:https://www.youtube.com/watch?v=Hi2JoAfnmRE
+簡報:https://www.canva.com/design/DAGoQBi7Li4/jThyTsjbZCsJYJ1LvXEBeA/edit?utm_content=DAGoQBi7Li4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
 ## 功能特色
 
 | 類別 | 功能說明 |
