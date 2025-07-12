@@ -1,0 +1,128 @@
+version: '3.8'
+
+services:
+  # 主應用程式服務
+  voice-chat-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ${CONTAINER_NAME:-voice-chat-gemini-app}
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.0-flash}
+      - WHISPER_MODEL=${WHISPER_MODEL:-base}
+      - HOST=${HOST:-0.0.0.0}
+      - PORT=8000
+      - DEBUG=${DEBUG:-true}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - TTS_VOICE=${TTS_VOICE:-zh-TW-HsiaoChenNeural}
+      - TTS_RATE=${TTS_RATE:-1.0}
+      - AUDIO_SAMPLE_RATE=${AUDIO_SAMPLE_RATE:-16000}
+      - AUDIO_DURATION=${AUDIO_DURATION:-5}
+    volumes:
+      # 掛載應用程式代碼 (開發模式)
+      - .:/app
+      # 持久化數據文件
+      - ./data:/app/data
+      # 持久化音頻文件
+      - ./audio:/app/audio
+    networks:
+      - voice-chat-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - redis
+    env_file:
+      - .env
+
+  # Redis 緩存服務 (可選，用於會話管理)
+  redis:
+    image: redis:7-alpine
+    container_name: voice-chat-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - voice-chat-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx 反向代理 (可選，用於生產環境)
+  nginx:
+    image: nginx:alpine
+    container_name: voice-chat-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - voice-chat-network
+    depends_on:
+      - voice-chat-app
+    restart: unless-stopped
+    profiles:
+      - production
+
+  # 監控服務 (可選)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: voice-chat-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - voice-chat-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: voice-chat-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+    networks:
+      - voice-chat-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+# 網絡配置
+networks:
+  voice-chat-network:
+    driver: bridge
+    name: ${NETWORK_NAME:-voice-chat-network}
+
+# 數據卷配置
+volumes:
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local

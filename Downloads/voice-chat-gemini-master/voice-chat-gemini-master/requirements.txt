@@ -1,0 +1,11 @@
+openai-whisper
+sounddevice
+scipy
+edge-tts
+google-generativeai
+emoji
+schedule
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
